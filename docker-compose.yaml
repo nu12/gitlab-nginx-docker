@@ -6,10 +6,20 @@ services:
     container_name: gitlab
     restart: unless-stopped
     hostname: gitlab.nu12.xyz
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.nu12.xyz'
     volumes:
       - gitlab_config:/etc/gitlab
       - gitlab_logs:/var/log/gitlab
       - gitlab_data:/var/opt/gitlab
+    
+  nginx:
+    image: nginx:1.17.10
+    container_name: nginx
+    restart: unless-stopped 
+    volumes: 
+      - ./conf.d:/etc/nginx/conf.d:ro
     ports:
         - 80:80
         - 443:443
