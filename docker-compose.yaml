@@ -8,11 +8,17 @@ services:
     hostname: gitlab.nu12.xyz
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://gitlab.nu12.xyz'
+        external_url 'https://gitlab.nu12.xyz'
+        nginx['redirect_http_to_https'] = true
+        nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab/cert.pem"
+        nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab/privkey.pem"
+        nginx['http2_enabled'] = false
     volumes:
       - gitlab_config:/etc/gitlab
       - gitlab_logs:/var/log/gitlab
       - gitlab_data:/var/opt/gitlab
+      - /etc/letsencrypt/live/gitlab:/etc/letsencrypt/live/gitlab:ro
+      - /etc/letsencrypt/archive/gitlab:/etc/letsencrypt/archive/gitlab:ro
     
   nginx:
     image: nginx:1.17.10
@@ -20,6 +26,8 @@ services:
     restart: unless-stopped 
     volumes: 
       - ./conf.d:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt/live/gitlab:/etc/letsencrypt/live/gitlab:ro
+      - /etc/letsencrypt/archive/gitlab:/etc/letsencrypt/archive/gitlab:ro
     ports:
         - 80:80
         - 443:443
@@ -31,3 +39,5 @@ volumes:
     external: true
   gitlab_data:
     external: true
+
+# sudo certbot certonly --cert-name gitlab -d gitlab.nu12.xyz
