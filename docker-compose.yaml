@@ -5,15 +5,16 @@ services:
     image: gitlab/gitlab-ce:13.9.2-ce.0
     container_name: gitlab
     restart: unless-stopped
-    hostname: gitlab.nu12.xyz
+    hostname: gitlab.your-domain.com
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'https://gitlab.nu12.xyz'
+        external_url 'https://gitlab.your-domain.com'
+	# Configure HTTPS
         nginx['redirect_http_to_https'] = true
         nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab/cert.pem"
         nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab/privkey.pem"
         nginx['http2_enabled'] = false
-
+	# Configure Mailgun
         gitlab_rails['smtp_enable'] = true
         gitlab_rails['smtp_address'] = "smtp.mailgun.org"
         gitlab_rails['smtp_port'] = 587
@@ -26,6 +27,7 @@ services:
       - gitlab_config:/etc/gitlab
       - gitlab_logs:/var/log/gitlab
       - gitlab_data:/var/opt/gitlab
+	# Mount certificates location (link & original)
       - /etc/letsencrypt/live/gitlab:/etc/letsencrypt/live/gitlab:ro
       - /etc/letsencrypt/archive/gitlab:/etc/letsencrypt/archive/gitlab:ro
     
@@ -35,6 +37,7 @@ services:
     restart: unless-stopped 
     volumes: 
       - ./conf.d:/etc/nginx/conf.d:ro
+	# Mount certificates location (link & original)
       - /etc/letsencrypt/live/gitlab:/etc/letsencrypt/live/gitlab:ro
       - /etc/letsencrypt/archive/gitlab:/etc/letsencrypt/archive/gitlab:ro
     ports:
@@ -43,10 +46,5 @@ services:
       
 volumes:
   gitlab_config:
-    external: true
   gitlab_logs:
-    external: true
   gitlab_data:
-    external: true
-
-# sudo certbot certonly --cert-name gitlab -d gitlab.nu12.xyz
