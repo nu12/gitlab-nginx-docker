@@ -2,7 +2,7 @@ version: '2'
 
 services:
   gitlab:
-    image: gitlab/gitlab-ce:12.10.11-ce.0
+    image: gitlab/gitlab-ce:13.9.2-ce.0
     container_name: gitlab
     restart: unless-stopped
     hostname: gitlab.nu12.xyz
@@ -30,7 +30,7 @@ services:
       - /etc/letsencrypt/archive/gitlab:/etc/letsencrypt/archive/gitlab:ro
     
   nginx:
-    image: nginx:1.17.10
+    image: nginx:1.19.7
     container_name: nginx
     restart: unless-stopped 
     volumes: 
